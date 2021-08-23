@@ -1,4 +1,4 @@
-import { dbService } from "fbase"
+import { dbService, storageService } from "fbase"
 import React, { useState } from "react"
 
 const Tweet = ({ tweetObj, isOwner }) => {
@@ -9,6 +9,7 @@ const Tweet = ({ tweetObj, isOwner }) => {
         const ok = window.confirm("정말 트윗을 지우겠습니까??")
         if (ok) {
             await dbService.doc(`tweets/${tweetObj.id}`).delete()
+            await storageService.refFromURL(tweetObj.imageUrl).delete()
         }
     }
     const toggleEditing = () => {
@@ -40,11 +41,12 @@ const Tweet = ({ tweetObj, isOwner }) => {
             ) : (
                 <>
                     <h4>{tweetObj.text}</h4>
-                    {isOwner &&
+                    {tweetObj.imageUrl && (<img src={tweetObj.imageUrl} width="50px" height="50px" />)}
+                    {isOwner && (
                         <>
                             <button onClick={onDeleteClick}>Delete</button>
                             <button onClick={toggleEditing}>Edit</button>
-                        </>}
+                        </>)}
                 </>
             )}
         </div>

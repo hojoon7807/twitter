@@ -1,10 +1,11 @@
 import Tweet from 'components/Tweet';
-import { dbService } from 'fbase';
+import TweetFactory from 'components/TweetFactory';
+import { dbService, storageService } from 'fbase';
 import React, { useEffect, useState } from 'react';
 
 const Home = ({ userObj }) => {
     console.log(userObj)
-    const [tweet, setTweet] = useState("")
+
     const [tweets, setTweets] = useState([])
 
     useEffect(() => {
@@ -26,27 +27,11 @@ const Home = ({ userObj }) => {
             setTweets(tweetArray)
         })
     }, [])
-    console.log(tweets)
 
-    const onSubmit = async (e) => {
-        e.preventDefault();
-        await dbService.collection("tweets").add({
-            text: tweet,
-            createAt: Date.now(),
-            creatorId: userObj.uid,
-        })
-        setTweet("")
-    }
-    const onChange = (e) => {
-        const { target: { value } } = e
-        setTweet(value)
-    }
+
     return (
         <div>
-            <form onSubmit={onSubmit}>
-                <input type="text" placeholder="what's on your mind" maxLength={120} value={tweet} onChange={onChange}></input>
-                <input type="submit" value="Tweet" />
-            </form>
+            <TweetFactory userObj={userObj} />
             <div>
                 {tweets.map(tweet => (
                     <Tweet key={tweet.id} tweetObj={tweet} isOwner={tweet.creatorId === userObj.uid} />
